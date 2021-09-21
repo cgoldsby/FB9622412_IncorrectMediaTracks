@@ -43,3 +43,35 @@ The expected behavior is that when a new instance of AVPlayer is assigned to the
 
 #### Os version
 ![os version](img/os-version.png)
+
+## Workaround 1: Replacing the AVPlayerItem instead of AVPlayer
+The issue of the media option tracks being incorrect when replacing the `AVPlayer` is not reproducible if the `AVPlayer` is reused and the `AVPlayerItem` is replaced. However, the audio options layout is incorrect. Depending on the audio options, the UI may have an empty list or the list is cut off. See [comment](https://github.com/cgoldsby/FB9622412_IncorrectMediaTracks/blob/e5690a0d6c74827709c38dd107ed3ae73929ba39/FB9622412_IncorrectMediaTracks/ViewController.swift#L33).
+
+| Stream 2 - Language options should not be present|
+| ---            |
+|![Language options should not be present](img/incorrect-workaround1-stream2.png)|
+
+In the following screenshots the test stream has two available languages: german and english. The list of audio languages appear to be empty but the user can change focus the items and scroll through the list. When the audio languages are focused the list is cut off.
+| Test Stream - Language options cut off | Test Stream - Language options have focus but are cut off |
+| ---            | ---
+|![](img/incorrect-wordaround1-stream-test.1.png)|![](img/incorrect-workaround1-stream-test.2.png)|
+
+When implementing the "workaround 1" solution in a production app there was a [mysterious crash](https://github.com/cgoldsby/FB9622412_IncorrectMediaTracks/blob/main/crash/Zattoo_2021-09-21-073133_Christophers-MacBook-Pro.crash) that occurred a few times but is not easy to reproduce.
+
+[Crash log](https://github.com/cgoldsby/FB9622412_IncorrectMediaTracks/blob/main/crash/Zattoo_2021-09-21-073133_Christophers-MacBook-Pro.crash)
+```
+Thread 0 Crashed:: Dispatch queue: com.apple.main-thread
+0   libobjc.A.dylib               	0x00007fff200923d7 objc_msgSend + 23
+1   libobjc.A.dylib               	0x00007fff200aa0a5 objc_getProperty + 72
+2   com.apple.AVKit               	0x00007fff35a569ff -[AVNowPlayingPlaybackControlsViewController infoPanelViewController:willShowViewController:] + 57
+3   com.apple.AVKit               	0x00007fff359d356e -[AVInfoPanelViewController infoMenuController:didSelectViewController:] + 82
+4   com.apple.AVKit               	0x00007fff35a255b9 __60-[AVInfoMenuController transitionSelectionFrom:to:animated:]_block_invoke + 507
+5   com.apple.AVKit               	0x00007fff359ea758 __100+[AVInfoMenuTransitioningAnimation infoPanelTransitioningAnimationFrom:to:containerView:completion:]_block_invoke.66 + 396
+6   com.apple.UIKitCore           	0x00007fff4dbe4f0d -[UIViewPropertyAnimator _executeCompletionHandlerWithFinalPosition:] + 226
+7   com.apple.UIKitCore           	0x00007fff4dbe5002 -[UIViewPropertyAnimator _runCompletions:finished:] + 118
+8   com.apple.UIKitCore           	0x00007fff4dbe3cf3 __61-[UIViewPropertyAnimator _setupAssociatedViewAnimationState:]_block_invoke + 168
+9   com.apple.UIKitCore           	0x00007fff4eb84e56 -[UIViewAnimationBlockDelegate _didEndBlockAnimation:finished:context:] + 779
+10  com.apple.UIKitCore           	0x00007fff4eb564d8 -[UIViewAnimationState sendDelegateAnimationDidStop:finished:] + 231
+11  com.apple.UIKitCore           	0x00007fff4eb56a7d -[UIViewAnimationState animationDidStop:finished:] + 263
+12  com.apple.UIKit.axbundle      	0x00007fff3d7f1ddb -[UIViewAnimationStateAccessibility animationDidStop:finished:] + 195
+```

@@ -30,7 +30,11 @@ final class ViewController: UIViewController {
     }
 
     /*
-     The comment code below replaces the AVPlayerItem instead of an AVPlayer. This code does work and the issue is not reproducible. The issue appears to be related to updating the player property of AVPlayerViewController.
+        Workaround 1: Replace AVPlayerItem instead of AVPlayer.
+
+        The code below replaces the AVPlayerItem instead of an AVPlayer. This code does work and the issue is not reproducible. The issue appears to be related to updating the player property of AVPlayerViewController.
+
+        However, the list of audio options are cut off and the layout does not display the full list of items.
      */
 
 //    @IBAction
